@@ -16,9 +16,5 @@
     if (archive) archive.innerHTML = message;
   }
 
-  if (window.location.protocol === "file:") {
-    loadScript("./snapshot.js?v=20260720-core-2", () => loadScript("./app.js?v=20260720-core-2"));
-  } else {
-    loadScript("./app.js?v=20260720-core-2");
-  }
+  loadScript("./snapshot.js?v=20260720-pages-1", () => loadScript("./app.js?v=20260720-pages-1"));
 })();
