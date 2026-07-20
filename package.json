@@ -1,0 +1,10 @@
+{
+  "name": "trump-market-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-release.js",
+    "start": "node server.js",
+    "test": "node scripts/audit-content.js && node scripts/smoke-ui.js && node scripts/test-server.js"
+  }
+}

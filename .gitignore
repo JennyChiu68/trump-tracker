@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+dist/
+coverage/
+*.log
+*.tmp
+~$*.docx
+
+# Internal source archives are intentionally excluded from the public repo.
+archive/
+data/trump-feed*.json
+data/trump-remarks.json
+insights-snapshot.js
+scripts/build_requirements_docx.py

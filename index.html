@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f5f7" />
+    <title>特朗普发言追踪 | 金十数据</title>
+    <link rel="stylesheet" href="./styles.css?v=20260720-core-2" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>特朗普发言追踪</h1>
+            <span id="windowLabel">--</span>
+          </div>
+        </div>
+      </header>
+
+      <nav class="module-switcher" data-module="market" aria-label="主要功能">
+        <button class="module-button active" type="button" data-primary-module="market" aria-pressed="true">
+          <span>行情异动</span>
+        </button>
+        <button class="module-button" type="button" data-primary-module="repeat" aria-pressed="false">
+          <span>老话重提</span>
+        </button>
+      </nav>
+
+      <section class="primary-panel" id="primaryPanel" data-module="market">
+        <div class="primary-head">
+          <div>
+            <span id="primaryKicker">市场传导</span>
+            <h2 id="primaryTitle">行情异动</h2>
+          </div>
+        </div>
+
+        <label class="search-box primary-search" for="primarySearchInput">
+          <span class="search-icon" aria-hidden="true"></span>
+          <input id="primarySearchInput" type="search" inputmode="search" autocomplete="off" placeholder="搜索品种、主题、关键词" />
+          <button id="clearPrimarySearch" type="button" aria-label="清空搜索" hidden>×</button>
+        </label>
+
+        <div id="primaryList" class="primary-list" aria-live="polite"></div>
+      </section>
+
+    </main>
+
+    <script src="./bootstrap.js?v=20260720-core-2"></script>
+  </body>
+</html>
