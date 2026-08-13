@@ -16,5 +16,5 @@
     if (archive) archive.innerHTML = message;
   }
 
-  loadScript("./snapshot.js?v=20260720-pages-1", () => loadScript("./app.js?v=20260720-pages-1"));
+  loadScript("./snapshot.js?v=20260813-latest-1", () => loadScript("./app.js?v=20260813-latest-1"));
 })();

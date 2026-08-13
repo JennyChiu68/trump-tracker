@@ -2,7 +2,7 @@
 
 const fs = require("node:fs/promises");
 
-const ORIGIN = "https://trumpstruth.org";
+const ORIGIN = "https://www.trumpstruth.org";
 const DEFAULT_FROM = "2026-01-01";
 const DEFAULT_TO = new Date().toISOString().slice(0, 10);
 const DEFAULT_OUT = "data/trump-feed.json";
@@ -184,14 +184,31 @@ function toFeedItem(item) {
 }
 
 async function requestText(url) {
-  const response = await fetch(url, {
-    headers: {
-      accept: "text/html,application/xhtml+xml",
-      "user-agent": "Jin10-Trump-Tracker-Prototype/1.0",
-    },
-  });
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${url}`);
-  return response.text();
+  const attempts = 3;
+  let lastError;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          accept: "text/html,application/xhtml+xml",
+          "user-agent": "Jin10-Trump-Tracker-Prototype/1.0",
+        },
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${url}`);
+      return response.text();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await delay(attempt * 1_000);
+    }
+  }
+
+  throw lastError;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function parseArchiveDate(value) {
