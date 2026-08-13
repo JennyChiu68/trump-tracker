@@ -49,6 +49,18 @@ async function main() {
     topics,
   };
 
+  const latestHormuz = items.find((item) => item.id === "trutharchive-40758");
+  if (!latestHormuz || !/完全控制霍尔木兹海峡/.test(latestHormuz.speechCn)) {
+    failures.push("最新霍尔木兹口径缺失或审核中文稿不正确");
+  }
+  const compensation = items.find((item) => item.id === "trutharchive-40703");
+  if (!compensation || !/损失赔偿/.test(compensation.speechCn)) {
+    failures.push("伊朗赔偿谈判口径缺失或审核中文稿不正确");
+  }
+  for (const id of ["trutharchive-40463", "trutharchive-40544"]) {
+    if (items.some((item) => item.id === id)) failures.push(`${id}: 民调拉票帖被误收为伊朗交易信号`);
+  }
+
   if (failures.length) throw new Error(`${failures.slice(0, 20).join("\n")}\n审计失败项：${failures.length}`);
   console.log(JSON.stringify(result));
 }

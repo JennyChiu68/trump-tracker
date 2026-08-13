@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node scripts/build-release.js",
     "start": "node server.js",
-    "test": "node scripts/audit-content.js && node scripts/smoke-ui.js && node scripts/test-server.js"
+    "update:data": "node scripts/update-latest.js",
+    "test": "node scripts/audit-content.js && node scripts/smoke-ui.js && node scripts/smoke-free.js && node scripts/test-server.js"
   }
 }

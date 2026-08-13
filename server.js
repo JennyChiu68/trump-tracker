@@ -13,6 +13,7 @@ const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
 };
 const securityHeaders = {
   "content-security-policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",

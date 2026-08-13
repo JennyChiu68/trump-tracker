@@ -75,6 +75,26 @@ const CHINA_BLOCK_TERMS = [
   "renminbi",
   "yuan",
 ];
+const REVIEWED_SPEECH_CN = {
+  "trutharchive-40393": "我认为最高法院关于出生公民权和关税的负面裁决，令美国损失了数万亿美元和国际声望。",
+  "trutharchive-40398": "我宣布和平委员会已就哈马斯及加沙其他武装组织全面解除武装达成协议；协议将分阶段执行，以军随后撤出，国际稳定部队将协助新的巴勒斯坦警察维护安全。",
+  "trutharchive-40453": "我说伊朗及其他中东国家已请求美方暂缓打击，并称协议框架包括立即全面开放霍尔木兹海峡、结束伊朗核威胁；我同意取消打击，但以迅速达成协议为条件。",
+  "trutharchive-40464": "我说雪佛龙重返委内瑞拉并有望扩大收益，也要求石油公司立即下调消费者端的成品油价格。",
+  "trutharchive-40465": "我指责伊朗一边请求谈判一边否认谈判，并称美国海军已控制霍尔木兹海峡；除非达成协议或伊朗完全投降，否则封锁不会解除，伊朗也绝不能拥有核武器。",
+  "trutharchive-40554": "我宣布把《濒危物种法》恢复到原定适用范围，以减少对石油、天然气、木材、住房和基础设施建设的监管限制。",
+  "trutharchive-40703": "我说伊朗要求获得五个月军事冲突的损失赔偿；作为回应，我也要求伊朗赔偿美军、受害者家属和伊朗抗议者，并已指示把这一要求纳入今后的所有谈判。",
+  "trutharchive-40758": "我说美国已完全控制霍尔木兹海峡，并考虑继续保持控制；海军封锁形成“钢铁之墙”，伊朗目前无力改变局面。",
+  "trutharchive-40158": "我已指示军方：每当伊朗造成一名美国军人死亡，伊朗都将为此付出数倍代价。",
+  "trutharchive-40161": "我与英国新任首相安迪·伯纳姆进行了很好的通话，讨论了北海石油、贸易、军事联盟和霍尔木兹海峡排雷等议题。",
+  "trutharchive-40176": "我已指示政府允许所有美国航空公司开通直飞黎巴嫩的航班，希望其他国家也这样做。",
+  "trutharchive-40182": "自2026年8月1日起，进口仿制药未来两年继续实行零关税，随后一年升至100%，再之后升至200%，以推动仿制药生产回流美国。",
+  "trutharchive-40212": "从现在起，伊朗每次在霍尔木兹海峡向船只开火，美国都将摧毁一座桥梁或发电厂，包括德黑兰附近或市内的目标。",
+  "trutharchive-40218": "美国与沙特的民用核协议将获批准，但条件是沙特加入《亚伯拉罕协议》；美国不反对不进行铀浓缩的民用核设施。",
+  "trutharchive-40219": "如果胡塞武装再次向船只开火，美国将认定伊朗对此负责，并对伊朗和胡塞武装实施重大军事惩罚。",
+  "trutharchive-40220": "从现在起，船只、货物及相关损失将由美国掌控的伊朗资金赔付。",
+  "trutharchive-40233": "加拿大取消邀请美国参加戈迪·豪大桥开通仪式，但原协议已被修改，美国现在将获得50%的利润；加拿大仍在向美国支付高额关税。",
+  "trutharchive-40235": "欧盟再次针对美国企业处以巨额罚款；我将立即启动301调查，并预计尽快对欧盟加征高额关税。",
+};
 const topicGrid = document.querySelector("#topicGrid");
 const signalDetail = document.querySelector("#signalDetail");
 const repeatGrid = document.querySelector("#repeatGrid");
@@ -179,6 +199,7 @@ function applyPayload(payload) {
         item.speechCn &&
         item.translationAligned &&
         !isGenericGeneratedSpeech(item.speechCn) &&
+        !isLowValuePoliticalEndorsement(item) &&
         !isChinaRelatedContent(item)
     )
   );
@@ -427,8 +448,9 @@ function normalizeFeed(items) {
     const quote = item.spokenText || item.text || item.quote || "";
     const context = item.context || "";
     const analysis = analyzeText(`${quote} ${context}`);
-    const isDirectSpeech = item.isDirectSpeech === true || isDirectTrumpSpeech(quote);
-    const speechCn = item.speechCn || buildChineseSpeech(quote, analysis);
+    const reviewedSpeechCn = REVIEWED_SPEECH_CN[item.id] || "";
+    const isDirectSpeech = item.isDirectSpeech === true || Boolean(reviewedSpeechCn) || isDirectTrumpSpeech(quote);
+    const speechCn = item.speechCn || reviewedSpeechCn || buildChineseSpeech(quote, analysis);
     return {
       id: item.id,
       date: item.publishedAt || item.date || "",
@@ -445,6 +467,14 @@ function normalizeFeed(items) {
       ...analysis,
     };
   });
+}
+
+function isLowValuePoliticalEndorsement(item) {
+  const text = String(item.quote || "").toLowerCase();
+  return (
+    /complete and total endorsement|great honor to endorse|total endorsement/.test(text) ||
+    /\brunning for (?:the )?(?:u\.s\. )?(?:senate|congress|governor|attorney general|secretary of state|lieutenant governor)\b/.test(text)
+  );
 }
 
 function isChinaRelatedContent(item) {
@@ -495,7 +525,7 @@ function isTranslationAligned(quote, speechCn) {
   if (hasCjk(quote)) return true;
 
   const anchors = [
-    [/和平示威者|抗议者/, /peaceful protesters?|protesters?/i],
+    [/和平示威者|抗议者/, /peaceful protest(?:e|o)rs?|protest(?:e|o)rs?/i],
     [/1000枚导弹|一千枚导弹/, /1000 missiles|one thousand missiles/i],
     [/伊朗/, /iran|iranian/i],
     [/霍尔木兹|海峡/, /hormuz|strait/i],
@@ -1197,25 +1227,27 @@ function tradeSignalForTopic(topic, latest, avgImpact) {
     const views = hasThreat
       ? [
           { asset: "原油", label: "供应风险", type: "risk" },
-          { asset: "黄金", label: "避险关注", type: "attention" },
+          { asset: "黄金", label: "避险/实际利率", type: "attention" },
           { asset: "美元", label: "波动关注", type: "watch" },
         ]
       : hasDeal
         ? [
             { asset: "原油", label: "供应预期变化", type: "watch" },
-            { asset: "黄金", label: "避险情绪变化", type: "watch" },
+            { asset: "黄金", label: "避险/实际利率", type: "attention" },
             { asset: "美元", label: "波动关注", type: "watch" },
           ]
         : [
             { asset: "原油", label: "影响待定", type: "watch" },
-            { asset: "黄金", label: "避险关注", type: "attention" },
+            { asset: "黄金", label: "避险/实际利率", type: "attention" },
             { asset: "美元", label: "波动关注", type: "watch" },
           ];
     return {
       action: hasThreat ? "risk" : "watch",
       actionLabel: hasThreat ? "风险升温" : "信息不足",
       views,
-      note: hasThreat ? "中东风险升温，重点观察能源供应与避险情绪是否同步变化。" : "最新口径仍需验证；协议文本、伊朗确认或军事行动会改变市场影响。",
+      note: hasThreat
+        ? "中东风险升温。原油重点看供应通道；黄金需同时观察避险需求、通胀预期、美元与实际利率，方向并非单一。"
+        : "最新口径仍需验证；协议文本、伊朗确认或军事行动会改变市场影响。黄金仍需结合避险需求、美元与实际利率判断。",
       trigger: "触发：霍尔木兹通行、军事行动、协议文本。",
     };
   }
@@ -1226,10 +1258,12 @@ function tradeSignalForTopic(topic, latest, avgImpact) {
       actionLabel: hasThreat ? "风险升温" : "信息不足",
       views: [
         { asset: "原油", label: hasThreat ? "供应风险" : "波动关注", type: hasThreat ? "risk" : "watch" },
-        { asset: "黄金", label: hasThreat ? "避险关注" : "波动关注", type: "attention" },
+        { asset: "黄金", label: "避险/实际利率", type: "attention" },
         { asset: "美元", label: "波动关注", type: "watch" },
       ],
-      note: hasThreat ? "军事风险升温，重点观察能源供应与避险情绪是否同步变化。" : "停火或谈判口径需要后续执行确认。",
+      note: hasThreat
+        ? "军事风险升温。原油重点看供应通道；黄金需同时观察避险需求、通胀预期、美元与实际利率。"
+        : "停火或谈判口径需要后续执行确认；黄金方向仍取决于避险需求与实际利率的共同变化。",
       trigger: "触发：停火执行、军事行动、能源通道。",
     };
   }
@@ -1994,7 +2028,7 @@ function translateTopicSpeech(value, analysis) {
     if (/plan that iran has just sent/i.test(value)) {
       return "我说会审查伊朗刚发来的方案，但目前难以接受，因为伊朗付出的代价还不够。";
     }
-    if (/vote on iran|iran.*vote|puts iran on notice/i.test(lower)) {
+    if (/\bvote on iran\b|\biran (?:resolution|sanctions?) vote\b|\bputs iran on notice\b/i.test(lower)) {
       return "我说参议院关于伊朗的投票结果发生变化，并称这会向伊朗发出信号。";
     }
     if (/iran/i.test(lower) && /(?:can never|cannot|must not|will not|won.?t).{0,20}(?:have|obtain).{0,20}nuclear/i.test(lower)) {

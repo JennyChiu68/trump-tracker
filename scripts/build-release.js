@@ -70,7 +70,7 @@ function buildSources(payload, supplemental) {
       name: "Trump’s Truth",
       status: "第三方公开归档；当前发布版本使用固定快照",
       connected: true,
-      url: `https://trumpstruth.org/search?start_date=${from}&end_date=${to}&removed=include`,
+      url: `https://www.trumpstruth.org/search?start_date=${from}&end_date=${to}&removed=include`,
     },
     truthSocial,
     ...(supplemental?.sources || []),
